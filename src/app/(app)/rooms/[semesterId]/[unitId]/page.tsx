@@ -190,17 +190,18 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
 // For Next.js to know which paths to pre-render if these are fully static.
 // Make sure these functions are imported or defined if not in global scope.
-const getSemesters = () => (require('@/lib/data') as any).semesters;
-const getUnitsBySemester = (semesterId: string) => (require('@/lib/data') as any).getUnitsBySemester(semesterId);
+const getSemestersData = () => (require('@/lib/data') as any).semesters;
+const getUnitsBySemesterData = (semesterId: string) => (require('@/lib/data') as any).getUnitsBySemester(semesterId);
 
 export async function generateStaticParams() {
-  const semesters = getSemesters(); 
+  const semesters = getSemestersData(); 
   const paths = [];
   for (const semester of semesters) {
-    const units = getUnitsBySemester(semester.id);
+    const units = getUnitsBySemesterData(semester.id);
     for (const unit of units) {
       paths.push({ semesterId: semester.id, unitId: unit.id });
     }
   }
   return paths;
 }
+

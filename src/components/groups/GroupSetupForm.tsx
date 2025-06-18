@@ -60,7 +60,7 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
   useEffect(() => {
     if (initialSemesterId) {
       form.setValue("semesterId", initialSemesterId);
-      setSelectedSemester(initialSemesterId);
+      setSelectedSemester(initialSemesterId); // Ensure local state for unit filtering is also set
     }
     if (initialUnitId) {
       form.setValue("unitId", initialUnitId);
@@ -77,8 +77,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
     const newGroup = createGroup({
       assignmentName: data.assignmentName,
       maxSize: data.maxSize,
-      semesterId: data.semesterId, // This will be the pre-filled/disabled value if initialSemesterId was passed
-      unitId: data.unitId, // This will be the pre-filled/disabled value if initialUnitId was passed
+      semesterId: data.semesterId, 
+      unitId: data.unitId, 
     });
 
     if (newGroup) {
@@ -86,13 +86,15 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
         title: "Group Created!",
         description: `Group "${data.assignmentName}" has been successfully created for ${getUnitById(newGroup.unitId || "")?.name || 'the selected unit'}.`,
       });
-      form.reset({ // Reset with initial values if provided, otherwise to blank
+      form.reset({ 
         assignmentName: "",
         maxSize: 3,
-        semesterId: initialSemesterId || "",
-        unitId: initialUnitId || "",
+        semesterId: initialSemesterId || "", // Reset to initial if provided
+        unitId: initialUnitId || "", // Reset to initial if provided
       });
-      if (!initialSemesterId) setSelectedSemester(""); // Only reset selectedSemester if it wasn't an initial prop
+      if (!initialSemesterId) { // Only reset selectedSemester if it wasn't fixed by props
+         setSelectedSemester("");
+      }
       onGroupCreated(); 
     } else {
       toast({
@@ -103,8 +105,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
     }
   }
   
-  const currentSemester = initialSemesterId ? getSemesterById(initialSemesterId) : null;
-  const currentUnit = initialUnitId ? getUnitById(initialUnitId) : null;
+  const currentSemesterForDesc = initialSemesterId ? getSemesterById(initialSemesterId) : null;
+  const currentUnitForDesc = initialUnitId ? getUnitById(initialUnitId) : null;
 
   return (
     <Card className="shadow-lg">
@@ -113,9 +115,9 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
             <PlusCircle className="mr-2 h-6 w-6"/>
             Create New Assignment Group
         </CardTitle>
-        {currentUnit && currentSemester ? (
+        {currentUnitForDesc && currentSemesterForDesc ? (
              <CardDescription>
-                Define the details for a new assignment group for <strong>{currentUnit.name} ({currentSemester.name})</strong>. Students will be able to join this group.
+                Define the details for a new assignment group for <strong>{currentUnitForDesc.name} ({currentSemesterForDesc.name})</strong>. Students will be able to join this group.
             </CardDescription>
         ): (
             <CardDescription>Define the details for a new assignment group. Students will be able to join this group.</CardDescription>
@@ -162,8 +164,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
                       setSelectedSemester(value);
                       form.setValue("unitId", ""); 
                     }} 
-                    value={field.value} // Use value from form state
-                    disabled={!!initialSemesterId} // Disable if initialSemesterId is provided
+                    value={field.value}
+                    disabled={!!initialSemesterId} 
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -171,8 +173,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {initialSemesterId && currentSemester ? (
-                        <SelectItem value={initialSemesterId}>{currentSemester.name}</SelectItem>
+                      {initialSemesterId && currentSemesterForDesc ? (
+                        <SelectItem value={initialSemesterId}>{currentSemesterForDesc.name}</SelectItem>
                       ) : (
                         semesters.map(semester => (
                           <SelectItem key={semester.id} value={semester.id}>{semester.name}</SelectItem>
@@ -192,8 +194,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
                   <FormLabel>Unit</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
-                    value={field.value} // Use value from form state
-                    disabled={!selectedSemester || !!initialUnitId} // Disable if no semester selected or if initialUnitId provided
+                    value={field.value} 
+                    disabled={!selectedSemester || !!initialUnitId} 
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -201,8 +203,8 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                       {initialUnitId && currentUnit ? (
-                        <SelectItem value={initialUnitId}>{currentUnit.name}</SelectItem>
+                       {initialUnitId && currentUnitForDesc ? (
+                        <SelectItem value={initialUnitId}>{currentUnitForDesc.name}</SelectItem>
                       ) : (
                         unitsForSelectedSemester.map(unit => (
                           <SelectItem key={unit.id} value={unit.id}>{unit.name}</SelectItem>
@@ -223,3 +225,4 @@ export function GroupSetupForm({ onGroupCreated, initialSemesterId, initialUnitI
     </Card>
   );
 }
+
