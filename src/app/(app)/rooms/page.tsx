@@ -1,9 +1,9 @@
 
-import { getSemesters, getUnitsBySemester } from "@/lib/data";
+import { getSemesters, getUnitsBySemester, getDocumentsByUnit, assignmentGroups } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, Folder, Users } from "lucide-react";
 
 const unitCardColors = [
   "bg-pink-600", "bg-green-600", "bg-sky-600", "bg-amber-600", 
@@ -31,24 +31,39 @@ export default async function RoomsPage() {
             <h2 className="text-3xl font-semibold font-headline text-primary mb-6 border-b pb-2">
               {semester.name}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {getUnitsBySemester(semester.id).map((unit, unitIndex) => {
-                const colorIndex = (semesterIndex * 5 + unitIndex) % unitCardColors.length;
+                const colorIndex = (semesterIndex * getUnitsBySemester(semester.id).length + unitIndex) % unitCardColors.length;
                 const cardColor = unitCardColors[colorIndex];
+                const documentsForUnit = getDocumentsByUnit(semester.id, unit.id);
+                const groupsForUnit = assignmentGroups.filter(group => group.unitId === unit.id && group.semesterId === semester.id);
+
                 return (
                   <Link href={`/rooms/${semester.id}/${unit.id}`} key={unit.id} className="block group">
-                    <Card className={`h-48 ${cardColor} text-primary-foreground overflow-hidden relative transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl flex flex-col justify-end p-4`}>
-                      <Image 
-                        src={`https://placehold.co/100x100.png`}
-                        alt="Abstract unit art"
-                        width={80}
-                        height={80}
-                        className="absolute -right-4 -bottom-2 opacity-40 group-hover:opacity-60 transform rotate-12 scale-110 transition-transform duration-300"
-                        data-ai-hint="abstract pattern"
-                      />
-                      <CardTitle className="text-lg font-semibold leading-tight relative z-10 drop-shadow-md">
-                        {unit.name}
-                      </CardTitle>
+                    <Card className={`h-56 ${cardColor} text-primary-foreground overflow-hidden relative transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl flex flex-col justify-between p-4`}>
+                      <div className="relative z-10">
+                        <Image 
+                          src={`https://placehold.co/80x80.png`}
+                          alt="Abstract unit art"
+                          width={60}
+                          height={60}
+                          className="absolute -right-2 -top-2 opacity-30 group-hover:opacity-50 transform rotate-12 scale-100 transition-all duration-300"
+                          data-ai-hint="abstract pattern"
+                        />
+                        <CardTitle className="text-lg font-semibold leading-tight drop-shadow-md mt-2">
+                          {unit.name}
+                        </CardTitle>
+                      </div>
+                      <div className="relative z-10 mt-auto">
+                        <div className="flex items-center text-xs opacity-80 group-hover:opacity-100 transition-opacity">
+                          <Folder className="w-3 h-3 mr-1.5" />
+                          <span>{documentsForUnit.length} Document{documentsForUnit.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center text-xs opacity-80 group-hover:opacity-100 transition-opacity mt-1">
+                          <Users className="w-3 h-3 mr-1.5" />
+                          <span>{groupsForUnit.length} Group{groupsForUnit.length !== 1 ? 's' : ''}</span>
+                        </div>
+                      </div>
                     </Card>
                   </Link>
                 );
@@ -70,3 +85,4 @@ export default async function RoomsPage() {
     </div>
   );
 }
+
