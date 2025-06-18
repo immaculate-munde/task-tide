@@ -33,9 +33,8 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshGroups = useCallback(() => {
-    const allGroups = getAllGroups(); // In a real app, this would be an API call.
-    const unitGroups = allGroups.filter(g => g.unitId === params.unitId && g.semesterId === params.semesterId);
-    // To ensure updates from addGroup/joinGroup in data.ts are reflected if it modifies the array in place:
+    // In a real app, this would be an API call.
+    // To ensure updates from addGroup/joinGroup in data.ts are reflected:
     setGroups([...staticGroupsData].filter(g => g.unitId === params.unitId && g.semesterId === params.semesterId));
   }, [params.unitId, params.semesterId]);
   
@@ -125,7 +124,11 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
         <TabsContent value="groups">
             {role === 'class_representative' && (
                 <div className="mb-8">
-                <GroupSetupForm onGroupCreated={refreshGroups} />
+                <GroupSetupForm 
+                    onGroupCreated={refreshGroups} 
+                    initialSemesterId={params.semesterId}
+                    initialUnitId={params.unitId}
+                />
                 </div>
             )}
              <Card className="mb-6">
@@ -186,10 +189,12 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 }
 
 // For Next.js to know which paths to pre-render if these are fully static.
-// If your units/semesters change often, you might adjust this or use dynamic rendering.
-// For now, assuming they are relatively static.
+// Make sure these functions are imported or defined if not in global scope.
+const getSemesters = () => (require('@/lib/data') as any).semesters;
+const getUnitsBySemester = (semesterId: string) => (require('@/lib/data') as any).getUnitsBySemester(semesterId);
+
 export async function generateStaticParams() {
-  const semesters = getSemesters(); // ensure this is available/imported if not in global scope
+  const semesters = getSemesters(); 
   const paths = [];
   for (const semester of semesters) {
     const units = getUnitsBySemester(semester.id);
@@ -199,4 +204,3 @@ export async function generateStaticParams() {
   }
   return paths;
 }
-
