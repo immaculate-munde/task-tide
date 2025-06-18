@@ -83,9 +83,8 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
 
   return (
-    <div className="p-6 space-y-6"> {/* Added padding and space-y for consistency */}
-      <header className="mb-2"> {/* Reduced mb from 8 to 2 */}
-        {/* Removed Back to Rooms Button as per Discord-like navigation */}
+    <div className="p-6 space-y-6">
+      <header className="mb-2">
         <h1 className="text-3xl font-bold font-headline text-primary flex items-center">
             <FolderOpen className="mr-3 h-8 w-8" /> {unit.name}
         </h1>
@@ -108,7 +107,7 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
                 </CardHeader>
                 <CardContent>
                     {documents.length > 0 ? (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {documents.map((doc) => (
                             <DocumentCard key={doc.id} document={doc} />
                         ))}
@@ -146,13 +145,13 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
             </Card>
 
             <Tabs defaultValue="available-unit-groups" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-2 mb-4"> {/* Ensure it's md:grid-cols-2 for proper wrapping */}
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-2 mb-4">
                     <TabsTrigger value="available-unit-groups">Available ({availableGroups.length})</TabsTrigger>
                     <TabsTrigger value="my-unit-groups">My Groups ({myGroups.length})</TabsTrigger>
                 </TabsList>
                 <TabsContent value="available-unit-groups">
                     {availableGroups.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Adjusted grid for potentially narrower space */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {availableGroups.map((group) => (
                         <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                         ))}
@@ -167,7 +166,7 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
                 </TabsContent>
                 <TabsContent value="my-unit-groups">
                 {myGroups.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Adjusted grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {myGroups.map((group) => (
                         <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                         ))}

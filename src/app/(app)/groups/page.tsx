@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { GroupSetupForm } from "@/components/groups/GroupSetupForm";
 import { GroupCard } from "@/components/groups/GroupCard";
-import { getGroups, assignmentGroups as staticGroups } from "@/lib/data"; // Using staticGroups for refresh
+import { getGroups, assignmentGroups as staticGroups, getUnitById as fetchUnitById } from "@/lib/data"; 
 import type { AssignmentGroup } from "@/lib/types";
 import { useAppContext } from "@/hooks/useAppContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,13 +15,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function GroupsPage() {
   const { currentUser, role } = useAppContext();
-  const [groups, setGroups] = useState<AssignmentGroup[]>(getGroups());
+  const [groups, setGroups] = useState<AssignmentGroup[]>([]); // Initialize empty
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Function to refresh groups from the source (simulated)
   const refreshGroups = () => {
-    // In a real app, this would be an API call. Here, we re-fetch from potentially updated mock data.
-    // To ensure updates from addGroup/joinGroup in data.ts are reflected if it modifies the array in place:
     setGroups([...staticGroups]);
   };
 
@@ -31,7 +28,7 @@ export default function GroupsPage() {
 
   const filteredGroups = groups.filter(group => 
     group.assignmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (group.unitId && getUnitById(group.unitId)?.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    (group.unitId && fetchUnitById(group.unitId)?.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
   const myGroups = filteredGroups.filter(g => g.members.some(m => m.id === currentUser.id) || g.createdBy.id === currentUser.id);
@@ -39,7 +36,7 @@ export default function GroupsPage() {
 
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       <header className="mb-8">
         <h1 className="text-4xl font-bold font-headline text-primary flex items-center">
             <Users className="mr-3 h-10 w-10"/> Assignment Groups
@@ -79,7 +76,7 @@ export default function GroupsPage() {
         </TabsList>
         <TabsContent value="available">
             {availableGroups.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 {availableGroups.map((group) => (
                 <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                 ))}
@@ -95,7 +92,7 @@ export default function GroupsPage() {
         </TabsContent>
         <TabsContent value="my-groups">
            {myGroups.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 {myGroups.map((group) => (
                 <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                 ))}
@@ -112,9 +109,4 @@ export default function GroupsPage() {
 
     </div>
   );
-}
-
-// Helper, assuming it's available from data.ts or defined here
-const getUnitById = (unitId: string) => {
-    return (staticGroups.find(g => g.unitId === unitId) as any)?.unitName || unitId; // simplified
 }

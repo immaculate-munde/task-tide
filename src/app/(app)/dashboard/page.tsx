@@ -11,13 +11,13 @@ export default function DashboardPage() {
   const { currentUser } = useAppContext();
 
   const quickStats = [
-    { title: "Total Documents", value: "125", icon: FolderKanban, color: "text-primary", href: "/rooms" }, // Updated href
-    { title: "Active Groups", value: "8", icon: Users, color: "text-accent", href: "/rooms" }, // Updated href
+    { title: "Total Documents", value: "125", icon: FolderKanban, color: "text-primary", href: "/rooms" },
+    { title: "Active Groups", value: "8", icon: Users, color: "text-accent", href: "/rooms" },
     { title: "Unread Notifications", value: "3", icon: Bell, color: "text-yellow-500", href: "/notifications" },
   ];
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       <Card className="mb-8 shadow-lg border-none bg-gradient-to-r from-primary to-purple-600 text-primary-foreground">
         <CardHeader>
           <CardTitle className="text-3xl font-headline">Welcome back, {currentUser.name}!</CardTitle>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
       
       <div className="mt-8 p-6 bg-card rounded-lg shadow">
         <h3 className="text-xl font-semibold mb-4 text-primary">Study Tip of the Day</h3>
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-start gap-4">
           <Image src="https://placehold.co/150x100.png" alt="Study tip illustration" width={150} height={100} className="rounded" data-ai-hint="education study" />
           <div>
             <p className="text-foreground">"Break down large assignments into smaller, manageable tasks. This makes them less daunting and helps maintain momentum."</p>

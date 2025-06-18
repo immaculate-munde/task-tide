@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const { currentUser } = useAppContext();
 
   return (
-    <div className="container mx-auto py-2 space-y-8">
+    <div className="container mx-auto py-6 space-y-8">
       <header className="mb-8">
         <h1 className="text-4xl font-bold font-headline text-primary flex items-center">
           <Settings className="mr-3 h-10 w-10" /> Settings

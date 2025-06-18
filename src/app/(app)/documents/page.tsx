@@ -9,7 +9,7 @@ export default async function DocumentsPage() {
   const semesters = getSemesters();
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       <header className="mb-8">
         <h1 className="text-4xl font-bold font-headline text-primary flex items-center">
           <BookCopy className="mr-3 h-10 w-10" /> Document Browser
@@ -20,7 +20,7 @@ export default async function DocumentsPage() {
       </header>
 
       {semesters.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {semesters.map((semester) => (
             <Link href={`/documents/${semester.id}`} key={semester.id} className="block">
               <Card className="h-full hover:shadow-xl hover:border-primary transition-all duration-300 ease-in-out transform hover:-translate-y-1">

@@ -1,5 +1,5 @@
 
-import { getDocumentsByUnit, getSemesterById, getUnitById } from "@/lib/data";
+import { getDocumentsByUnit, getSemesterById, getUnitById, getSemesters, getUnitsBySemester } from "@/lib/data";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export default async function UnitDocumentsPage({ params }: UnitDocumentsPagePro
   }
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       <header className="mb-8">
         <Button asChild variant="outline" size="sm" className="mb-4">
             <Link href={`/documents/${semesterId}`}>
@@ -52,7 +52,7 @@ export default async function UnitDocumentsPage({ params }: UnitDocumentsPagePro
       </header>
 
       {documents.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {documents.map((doc) => (
             <DocumentCard key={doc.id} document={doc} />
           ))}

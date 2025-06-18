@@ -32,7 +32,7 @@ export default async function SemesterUnitsPage({ params }: SemesterUnitsPagePro
   }
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       <header className="mb-8">
         <Button asChild variant="outline" size="sm" className="mb-4">
             <Link href="/documents">
@@ -48,7 +48,7 @@ export default async function SemesterUnitsPage({ params }: SemesterUnitsPagePro
       </header>
 
       {units.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {units.map((unit) => (
             <Link href={`/documents/${semester.id}/${unit.id}`} key={unit.id} className="block">
               <Card className="h-full hover:shadow-xl hover:border-primary transition-all duration-300 ease-in-out transform hover:-translate-y-1">
@@ -81,4 +81,3 @@ export async function generateStaticParams() {
   const semesters = getSemesters();
   return semesters.map(semester => ({ semester: semester.id }));
 }
-

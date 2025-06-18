@@ -33,7 +33,7 @@ export default async function DocumentViewPage({ params }: DocumentViewPageProps
   const unit = getUnitById(document.unitId);
 
   return (
-    <div className="container mx-auto py-2 flex flex-col h-full">
+    <div className="container mx-auto py-6 flex flex-col h-full">
       <header className="mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
