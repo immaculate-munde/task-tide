@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { getUnitById, getSemesterById, getDocumentsByUnit, getGroups as getAllGroups, assignmentGroups as staticGroupsData } from "@/lib/data";
+import { getUnitById, getSemesterById, getDocumentsByUnit, assignmentGroups as staticGroupsData } from "@/lib/data";
 import type { DocumentFile, AssignmentGroup, Unit, Semester } from "@/lib/types";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { GroupCard } from "@/components/groups/GroupCard";
@@ -187,21 +187,3 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
     </div>
   );
 }
-
-// For Next.js to know which paths to pre-render if these are fully static.
-// Make sure these functions are imported or defined if not in global scope.
-const getSemestersData = () => (require('@/lib/data') as any).semesters;
-const getUnitsBySemesterData = (semesterId: string) => (require('@/lib/data') as any).getUnitsBySemester(semesterId);
-
-export async function generateStaticParams() {
-  const semesters = getSemestersData(); 
-  const paths = [];
-  for (const semester of semesters) {
-    const units = getUnitsBySemesterData(semester.id);
-    for (const unit of units) {
-      paths.push({ semesterId: semester.id, unitId: unit.id });
-    }
-  }
-  return paths;
-}
-
