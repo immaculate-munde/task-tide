@@ -11,10 +11,9 @@ import { useAppContext } from "@/hooks/useAppContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Users as UsersIcon, FolderOpen, AlertCircle } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, BookOpen, Users as UsersIcon, FolderOpen, AlertCircle, Search } from "lucide-react";
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 interface UnitRoomPageProps {
   params: {
@@ -74,16 +73,32 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
     );
   }
 
-  const filteredGroups = groups.filter(group => 
-    group.assignmentName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
-  const myGroups = filteredGroups.filter(g => g.members.some(m => m.id === currentUser.id) || g.createdBy.id === currentUser.id);
-  const availableGroups = filteredGroups.filter(g => !g.members.some(m => m.id === currentUser.id) && g.createdBy.id !== currentUser.id && g.members.length < g.maxSize);
+  const filteredAndSortedGroups = groups
+    .filter(group => group.assignmentName.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      const aIsJoinable = !a.members.some(m => m.id === currentUser.id) && a.createdBy.id !== currentUser.id && a.members.length < a.maxSize;
+      const bIsJoinable = !b.members.some(m => m.id === currentUser.id) && b.createdBy.id !== currentUser.id && b.members.length < b.maxSize;
+      
+      if (aIsJoinable && !bIsJoinable) return -1;
+      if (!aIsJoinable && bIsJoinable) return 1;
 
+      const aIsCreator = a.createdBy.id === currentUser.id;
+      const bIsCreator = b.createdBy.id === currentUser.id;
+
+      if (aIsCreator && !bIsCreator) return -1; // Prioritize created groups if not joinable
+      if (!aIsCreator && bIsCreator) return 1;
+      
+      const aIsMember = a.members.some(m => m.id === currentUser.id);
+      const bIsMember = b.members.some(m => m.id === currentUser.id);
+
+      if (aIsMember && !bIsMember) return -1; // Then groups user is a member of
+      if (!aIsMember && bIsMember) return 1;
+
+      return a.assignmentName.localeCompare(b.assignmentName); // Alphabetical for others
+    });
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-8">
       <header className="mb-2">
         <h1 className="text-3xl font-bold font-headline text-primary flex items-center">
             <FolderOpen className="mr-3 h-8 w-8" /> {unit.name}
@@ -93,95 +108,85 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
         </p>
       </header>
 
-      <Tabs defaultValue="documents" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="documents"><BookOpen className="mr-2 h-5 w-5"/>Documents ({documents.length})</TabsTrigger>
-          <TabsTrigger value="groups"><UsersIcon className="mr-2 h-5 w-5"/>Groups ({groups.length})</TabsTrigger>
-        </TabsList>
+      {/* Documents Section */}
+      <Card>
+          <CardHeader>
+              <CardTitle className="text-2xl font-headline flex items-center">
+                <BookOpen className="mr-3 h-7 w-7 text-primary" />
+                Unit Documents
+              </CardTitle>
+              <CardDescription>All learning materials and resources for this unit. ({documents.length} found)</CardDescription>
+          </CardHeader>
+          <CardContent>
+              {documents.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {documents.map((doc) => (
+                      <DocumentCard key={doc.id} document={doc} />
+                  ))}
+                  </div>
+              ) : (
+                  <p className="text-muted-foreground py-4 text-center">No documents found for this unit.</p>
+              )}
+          </CardContent>
+      </Card>
 
-        <TabsContent value="documents">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-xl">Unit Documents</CardTitle>
-                    <CardDescription>All learning materials and resources for this unit.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {documents.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {documents.map((doc) => (
-                            <DocumentCard key={doc.id} document={doc} />
-                        ))}
-                        </div>
-                    ) : (
-                        <p className="text-muted-foreground py-4 text-center">No documents found for this unit.</p>
-                    )}
-                </CardContent>
-            </Card>
-        </TabsContent>
+      <Separator className="my-8"/>
 
-        <TabsContent value="groups">
-            {role === 'class_representative' && (
-                <div className="mb-6">
-                <GroupSetupForm 
-                    onGroupCreated={refreshGroups} 
-                    initialSemesterId={params.semesterId}
-                    initialUnitId={params.unitId}
-                />
+      {/* Groups Section */}
+      <div>
+        <CardHeader className="px-0 pt-0">
+            <CardTitle className="text-2xl font-headline flex items-center">
+                <UsersIcon className="mr-3 h-7 w-7 text-primary" />
+                Assignment Groups
+            </CardTitle>
+            <CardDescription>Join or manage groups for assignments in this unit. ({groups.length} total)</CardDescription>
+        </CardHeader>
+
+        {role === 'class_representative' && (
+            <div className="mb-6">
+            <GroupSetupForm 
+                onGroupCreated={refreshGroups} 
+                initialSemesterId={params.semesterId}
+                initialUnitId={params.unitId}
+            />
+            </div>
+        )}
+        
+        <Card className="mb-6">
+            <CardContent className="p-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                        type="search"
+                        placeholder="Search groups in this unit by assignment name..."
+                        className="pl-10 w-full"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
-            )}
-             <Card className="mb-6">
-                <CardContent className="p-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input 
-                            type="search"
-                            placeholder="Search groups in this unit by assignment name..."
-                            className="pl-10 w-full"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+            </CardContent>
+        </Card>
 
-            <Tabs defaultValue="available-unit-groups" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-2 mb-4">
-                    <TabsTrigger value="available-unit-groups">Available ({availableGroups.length})</TabsTrigger>
-                    <TabsTrigger value="my-unit-groups">My Groups ({myGroups.length})</TabsTrigger>
-                </TabsList>
-                <TabsContent value="available-unit-groups">
-                    {availableGroups.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {availableGroups.map((group) => (
-                        <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
-                        ))}
-                    </div>
-                    ) : (
-                    <Card>
-                        <CardContent className="py-10 text-center">
-                        <p className="text-lg text-muted-foreground">No available groups found in this unit{searchTerm && " matching your search"}.</p>
-                        </CardContent>
-                    </Card>
-                    )}
-                </TabsContent>
-                <TabsContent value="my-unit-groups">
-                {myGroups.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {myGroups.map((group) => (
-                        <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
-                        ))}
-                    </div>
-                    ) : (
-                    <Card>
-                        <CardContent className="py-10 text-center">
-                        <p className="text-lg text-muted-foreground">You are not part of any groups for this unit, nor have you created any{searchTerm && " that match your search"}.</p>
-                        </CardContent>
-                    </Card>
-                    )}
-                </TabsContent>
-            </Tabs>
-        </TabsContent>
-      </Tabs>
+        {filteredAndSortedGroups.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAndSortedGroups.map((group) => (
+            <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
+            ))}
+        </div>
+        ) : (
+        <Card>
+            <CardContent className="py-10 text-center">
+            <p className="text-lg text-muted-foreground">
+                No assignment groups found for this unit{searchTerm && " matching your search"}.
+            </p>
+            {role === 'class_representative' && !searchTerm && (
+                <p className="mt-2">You can create a new group using the form above.</p>
+            )}
+            </CardContent>
+        </Card>
+        )}
+      </div>
     </div>
   );
 }
+
