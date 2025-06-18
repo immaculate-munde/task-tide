@@ -40,24 +40,24 @@ export default async function RoomsPage() {
 
                 return (
                   <Link href={`/rooms/${semester.id}/${unit.id}`} key={unit.id} className="block group">
-                    <Card className={`h-56 ${cardColor} text-primary-foreground overflow-hidden relative transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl flex flex-col justify-between p-4`}>
+                    <Card className={`h-48 ${cardColor} text-primary-foreground overflow-hidden relative transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl flex flex-col justify-between p-3`}>
                       <div className="relative z-10">
                         <Image 
                           src={`https://placehold.co/80x80.png`}
                           alt="Abstract unit art"
-                          width={60}
-                          height={60}
-                          className="absolute -right-2 -top-2 opacity-30 group-hover:opacity-50 transform rotate-12 scale-100 transition-all duration-300"
+                          width={48}
+                          height={48}
+                          className="absolute -right-1.5 -top-1.5 opacity-30 group-hover:opacity-50 transform rotate-12 scale-100 transition-all duration-300"
                           data-ai-hint="abstract pattern"
                         />
-                        <CardTitle className="text-lg font-semibold leading-tight drop-shadow-md mt-2">
+                        <CardTitle className="text-base font-semibold drop-shadow-sm">
                           {unit.name}
                         </CardTitle>
                       </div>
                       <div className="relative z-10 mt-auto">
                         <div className="flex items-center text-xs opacity-80 group-hover:opacity-100 transition-opacity">
                           <Folder className="w-3 h-3 mr-1.5" />
-                          <span>{documentsForUnit.length} Document{documentsForUnit.length !== 1 ? 's' : ''}</span>
+                          <span>{documentsForUnit.length} Doc{documentsForUnit.length !== 1 ? 's' : ''}</span>
                         </div>
                         <div className="flex items-center text-xs opacity-80 group-hover:opacity-100 transition-opacity mt-1">
                           <Users className="w-3 h-3 mr-1.5" />
@@ -85,4 +85,3 @@ export default async function RoomsPage() {
     </div>
   );
 }
-
