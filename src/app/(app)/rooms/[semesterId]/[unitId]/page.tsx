@@ -8,10 +8,10 @@ import { DocumentCard } from "@/components/documents/DocumentCard";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { GroupSetupForm } from "@/components/groups/GroupSetupForm";
 import { useAppContext } from "@/hooks/useAppContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Users as UsersIcon, FolderOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Users as UsersIcon, FolderOpen, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
@@ -33,8 +33,6 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshGroups = useCallback(() => {
-    // In a real app, this would be an API call.
-    // To ensure updates from addGroup/joinGroup in data.ts are reflected:
     setGroups([...staticGroupsData].filter(g => g.unitId === params.unitId && g.semesterId === params.semesterId));
   }, [params.unitId, params.semesterId]);
   
@@ -60,12 +58,16 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
   if (!unit || !semester) {
     return (
-      <div className="container mx-auto py-10 text-center">
-        <h1 className="text-2xl font-bold text-destructive">Unit or Semester Not Found</h1>
-        <p className="text-muted-foreground mt-2">The requested unit or semester does not exist.</p>
-        <Button asChild variant="link" className="mt-4">
+      <div className="flex-1 p-6 flex flex-col items-center justify-center text-center bg-background">
+        <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+        <h1 className="text-3xl font-bold text-destructive mb-2">Unit or Semester Not Found</h1>
+        <p className="text-lg text-muted-foreground mb-6">
+          The specific unit or semester you are looking for could not be found. 
+          It might have been moved, deleted, or the link might be incorrect.
+        </p>
+        <Button asChild variant="default" size="lg">
           <Link href="/rooms">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Go back to Rooms
+            <ArrowLeft className="mr-2 h-5 w-5" /> Go back to Rooms
           </Link>
         </Button>
       </div>
@@ -81,41 +83,38 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
 
   return (
-    <div className="container mx-auto py-2">
-      <header className="mb-8">
-        <Button asChild variant="outline" size="sm" className="mb-4">
-            <Link href="/rooms">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Rooms
-            </Link>
-        </Button>
-        <h1 className="text-4xl font-bold font-headline text-primary flex items-center">
-            <FolderOpen className="mr-3 h-10 w-10" /> {unit.name}
+    <div className="p-6 space-y-6"> {/* Added padding and space-y for consistency */}
+      <header className="mb-2"> {/* Reduced mb from 8 to 2 */}
+        {/* Removed Back to Rooms Button as per Discord-like navigation */}
+        <h1 className="text-3xl font-bold font-headline text-primary flex items-center">
+            <FolderOpen className="mr-3 h-8 w-8" /> {unit.name}
         </h1>
-        <p className="text-lg text-muted-foreground mt-2">
+        <p className="text-md text-muted-foreground mt-1">
           Resources and groups for {unit.name} in {semester.name}.
         </p>
       </header>
 
       <Tabs defaultValue="documents" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="documents"><BookOpen className="mr-2 h-5 w-5"/>Documents</TabsTrigger>
-          <TabsTrigger value="groups"><UsersIcon className="mr-2 h-5 w-5"/>Groups</TabsTrigger>
+          <TabsTrigger value="documents"><BookOpen className="mr-2 h-5 w-5"/>Documents ({documents.length})</TabsTrigger>
+          <TabsTrigger value="groups"><UsersIcon className="mr-2 h-5 w-5"/>Groups ({groups.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documents">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl">Unit Documents</CardTitle>
+                    <CardTitle className="text-xl">Unit Documents</CardTitle>
+                    <CardDescription>All learning materials and resources for this unit.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {documents.length > 0 ? (
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {documents.map((doc) => (
                             <DocumentCard key={doc.id} document={doc} />
                         ))}
                         </div>
                     ) : (
-                        <p className="text-muted-foreground">No documents found for this unit.</p>
+                        <p className="text-muted-foreground py-4 text-center">No documents found for this unit.</p>
                     )}
                 </CardContent>
             </Card>
@@ -123,7 +122,7 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
         <TabsContent value="groups">
             {role === 'class_representative' && (
-                <div className="mb-8">
+                <div className="mb-6">
                 <GroupSetupForm 
                     onGroupCreated={refreshGroups} 
                     initialSemesterId={params.semesterId}
@@ -137,7 +136,7 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input 
                             type="search"
-                            placeholder="Search groups in this unit..."
+                            placeholder="Search groups in this unit by assignment name..."
                             className="pl-10 w-full"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -147,13 +146,13 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
             </Card>
 
             <Tabs defaultValue="available-unit-groups" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:w-1/2 mb-4">
-                    <TabsTrigger value="available-unit-groups">Available to Join</TabsTrigger>
-                    <TabsTrigger value="my-unit-groups">My Groups / Created</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-2 mb-4"> {/* Ensure it's md:grid-cols-2 for proper wrapping */}
+                    <TabsTrigger value="available-unit-groups">Available ({availableGroups.length})</TabsTrigger>
+                    <TabsTrigger value="my-unit-groups">My Groups ({myGroups.length})</TabsTrigger>
                 </TabsList>
                 <TabsContent value="available-unit-groups">
                     {availableGroups.length > 0 ? (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Adjusted grid for potentially narrower space */}
                         {availableGroups.map((group) => (
                         <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                         ))}
@@ -161,14 +160,14 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
                     ) : (
                     <Card>
                         <CardContent className="py-10 text-center">
-                        <p className="text-xl text-muted-foreground">No available groups found in this unit.</p>
+                        <p className="text-lg text-muted-foreground">No available groups found in this unit{searchTerm && " matching your search"}.</p>
                         </CardContent>
                     </Card>
                     )}
                 </TabsContent>
                 <TabsContent value="my-unit-groups">
                 {myGroups.length > 0 ? (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"> {/* Adjusted grid */}
                         {myGroups.map((group) => (
                         <GroupCard key={group.id} group={group} onGroupJoinedOrUpdated={refreshGroups} />
                         ))}
@@ -176,7 +175,7 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
                     ) : (
                     <Card>
                         <CardContent className="py-10 text-center">
-                        <p className="text-xl text-muted-foreground">You are not part of any groups for this unit, nor have you created any.</p>
+                        <p className="text-lg text-muted-foreground">You are not part of any groups for this unit, nor have you created any{searchTerm && " that match your search"}.</p>
                         </CardContent>
                     </Card>
                     )}
