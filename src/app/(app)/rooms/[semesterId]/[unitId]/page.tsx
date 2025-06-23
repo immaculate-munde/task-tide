@@ -102,20 +102,20 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
 
   return (
     <div className="p-6 space-y-8">
-      <header className="mb-2 flex justify-between items-center">
-        <div>
-            <h1 className="text-3xl font-bold font-headline text-primary flex items-center">
-                <FolderOpen className="mr-3 h-8 w-8" /> {unit.name}
-            </h1>
-            <p className="text-md text-muted-foreground mt-1">
-            Resources and groups for {unit.name} in {semester.name}.
-            </p>
-        </div>
-        <Button asChild variant="outline" size="sm">
+      <header className="mb-4 flex items-center gap-4">
+        <Button asChild variant="outline" size="icon" aria-label="Back to all rooms">
             <Link href="/rooms">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back to All Rooms
+                <ArrowLeft className="h-5 w-5" />
             </Link>
         </Button>
+        <div>
+            <h1 className="text-3xl font-bold font-headline text-primary">
+                {unit.name}
+            </h1>
+            <p className="text-md text-muted-foreground mt-1">
+            Resources for {unit.name} in {semester.name}.
+            </p>
+        </div>
       </header>
 
       {/* Documents Section */}
