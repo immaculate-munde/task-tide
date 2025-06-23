@@ -56,18 +56,6 @@ export let notifications: NotificationMessage[] = [
 // Helper functions
 export const getSemesters = (): Semester[] => semesters;
 
-export const addSemester = (name: string, isPublic: boolean, creator: User): Semester => {
-  const newSemester: Semester = {
-    id: `sem${Date.now()}`,
-    name,
-    isPublic,
-    createdBy: { id: creator.id, name: creator.name },
-  };
-  semesters.push(newSemester);
-  // Potentially, sort semesters or handle order
-  return newSemester;
-};
-
 export const getUnitsBySemester = (semesterId: string): Unit[] => units.filter(u => u.semesterId === semesterId);
 export const getDocumentsByUnit = (semesterId: string, unitId: string): DocumentFile[] => 
   documents.filter(d => d.semesterId === semesterId && d.unitId === unitId);

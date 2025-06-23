@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAppContext } from "@/hooks/useAppContext";
-import { BookOpen, FolderKanban, Users, Bell, LayoutGrid } from "lucide-react";
+import { BookOpen, Users, Bell, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { currentUser } = useAppContext();
 
   const quickStats = [
-    { title: "Total Documents", value: "125", icon: FolderKanban, color: "text-primary", href: "/rooms" },
+    { title: "Total Documents", value: "125", icon: BookOpen, color: "text-primary", href: "/rooms" },
     { title: "Active Groups", value: "8", icon: Users, color: "text-accent", href: "/rooms" },
     { title: "Unread Notifications", value: "3", icon: Bell, color: "text-yellow-500", href: "/notifications" },
   ];
@@ -61,10 +61,6 @@ export default function DashboardPage() {
                 <h3 className="font-semibold text-lg text-primary">Explore Rooms</h3>
             </div>
             <p className="text-sm text-muted-foreground">Access documents and groups organized by semester and unit.</p>
-          </Link>
-           <Link href="/settings" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
-            <h3 className="font-semibold text-lg mb-1">Update Settings</h3>
-            <p className="text-sm text-muted-foreground">Manage your profile information and application preferences.</p>
           </Link>
         </CardContent>
       </Card>

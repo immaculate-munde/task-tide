@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getUnitById, getSemesterById, getDocumentsByUnit, assignmentGroups as staticGroupsData } from "@/lib/data";
 import type { DocumentFile, AssignmentGroup, Unit, Semester } from "@/lib/types";
 import { DocumentCard } from "@/components/documents/DocumentCard";
@@ -51,6 +51,33 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
     setIsLoading(false);
   }, [params.semesterId, params.unitId, refreshGroups]);
 
+  const filteredAndSortedGroups = useMemo(() => {
+    // Helper function to assign a sorting score to each group
+    const getGroupScore = (group: AssignmentGroup): number => {
+      const isCreator = group.createdBy.id === currentUser.id;
+      const isMember = group.members.some(m => m.id === currentUser.id);
+      const isJoinable = !isMember && !isCreator && group.members.length < group.maxSize;
+      
+      if (isJoinable) return 1; // Highest priority
+      if (isCreator) return 2;
+      if (isMember) return 3;
+      return 4; // Other groups (e.g., full and not a member)
+    };
+    
+    return groups
+      .filter(group => group.assignmentName.toLowerCase().includes(searchTerm.toLowerCase()))
+      .sort((a, b) => {
+        const scoreA = getGroupScore(a);
+        const scoreB = getGroupScore(b);
+        if (scoreA !== scoreB) {
+          return scoreA - scoreB;
+        }
+        // If scores are equal, sort alphabetically by name
+        return a.assignmentName.localeCompare(b.assignmentName);
+      });
+  }, [groups, searchTerm, currentUser]);
+
+
   if (isLoading) {
     return <div className="container mx-auto py-10 text-center">Loading unit details...</div>;
   }
@@ -72,30 +99,6 @@ export default function UnitRoomPage({ params }: UnitRoomPageProps) {
       </div>
     );
   }
-
-  const filteredAndSortedGroups = groups
-    .filter(group => group.assignmentName.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      const aIsJoinable = !a.members.some(m => m.id === currentUser.id) && a.createdBy.id !== currentUser.id && a.members.length < a.maxSize;
-      const bIsJoinable = !b.members.some(m => m.id === currentUser.id) && b.createdBy.id !== currentUser.id && b.members.length < b.maxSize;
-      
-      if (aIsJoinable && !bIsJoinable) return -1;
-      if (!aIsJoinable && bIsJoinable) return 1;
-
-      const aIsCreator = a.createdBy.id === currentUser.id;
-      const bIsCreator = b.createdBy.id === currentUser.id;
-
-      if (aIsCreator && !bIsCreator) return -1; 
-      if (!aIsCreator && bIsCreator) return 1;
-      
-      const aIsMember = a.members.some(m => m.id === currentUser.id);
-      const bIsMember = b.members.some(m => m.id === currentUser.id);
-
-      if (aIsMember && !bIsMember) return -1; 
-      if (!aIsMember && bIsMember) return 1;
-
-      return a.assignmentName.localeCompare(b.assignmentName); 
-    });
 
   return (
     <div className="p-6 space-y-8">

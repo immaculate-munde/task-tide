@@ -8,11 +8,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAppContext } from "@/hooks/useAppContext";
+import { useToast } from "@/hooks/use-toast";
 import { Settings, UserCircle, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 
 export default function SettingsPage() {
   const { currentUser } = useAppContext();
+  const { toast } = useToast();
+
+  const handleSaveChanges = () => {
+    toast({
+      title: "Profile Updated",
+      description: "Your profile information has been saved.",
+    });
+  };
+
+  const handleChangePassword = () => {
+    toast({
+      title: "Password Updated",
+      description: "Your password has been changed successfully.",
+    });
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-8">
@@ -58,7 +74,9 @@ export default function SettingsPage() {
               <Input id="email" type="email" defaultValue={currentUser.email} className="mt-1" readOnly/>
             </div>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Save Profile Changes</Button>
+          <Button onClick={handleSaveChanges} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            Save Profile Changes
+          </Button>
         </CardContent>
       </Card>
       
@@ -84,7 +102,9 @@ export default function SettingsPage() {
               <Label htmlFor="confirm-password">Confirm New Password</Label>
               <Input id="confirm-password" type="password" className="mt-1" />
             </div>
-          <Button variant="destructive">Change Password</Button>
+          <Button onClick={handleChangePassword} variant="destructive">
+            Change Password
+          </Button>
         </CardContent>
       </Card>
 
