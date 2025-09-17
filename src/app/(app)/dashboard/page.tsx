@@ -2,21 +2,22 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAppContext } from "@/hooks/useAppContext";
-import { BookOpen, FolderKanban, Users, Bell } from "lucide-react";
+import { BookOpen, Users, Bell, LayoutGrid } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import StudyTipCard from "@/components/StudyTipCard";
 
 export default function DashboardPage() {
   const { currentUser } = useAppContext();
 
   const quickStats = [
-    { title: "Total Documents", value: "125", icon: FolderKanban, color: "text-primary", href: "/documents" },
-    { title: "Active Groups", value: "8", icon: Users, color: "text-accent", href: "/groups" },
+    { title: "Total Documents", value: "125", icon: BookOpen, color: "text-primary", href: "/rooms" },
+    { title: "Active Groups", value: "8", icon: Users, color: "text-accent", href: "/rooms" },
     { title: "Unread Notifications", value: "3", icon: Bell, color: "text-yellow-500", href: "/notifications" },
   ];
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-6">
       {/* Welcome Banner */}
       <Card className="mb-8 shadow-lg border-none bg-gradient-to-r from-primary to-purple-600 text-primary-foreground">
         <CardHeader>
@@ -49,12 +50,8 @@ export default function DashboardPage() {
                 <stat.icon className={`h-6 w-6 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold ${stat.color}`}>
-                  {stat.value}
-                </div>
-                <p className="text-xs text-muted-foreground pt-1">
-                  View {stat.title.toLowerCase()}
-                </p>
+                <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
+                <p className="text-xs text-muted-foreground pt-1">View details</p>
               </CardContent>
             </Card>
           </Link>
@@ -62,7 +59,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <Card>
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle className="text-2xl font-headline flex items-center">
             <BookOpen className="mr-3 h-7 w-7 text-primary" />
@@ -70,25 +67,12 @@ export default function DashboardPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Link href="/documents" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
-            <h3 className="font-semibold text-lg text-primary mb-1">Browse Documents</h3>
-            <p className="text-sm text-muted-foreground">
-              Access all your course materials organized by semester and unit.
-            </p>
-          </Link>
-          <Link href="/groups" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
-            <h3 className="font-semibold text-lg text-accent mb-1">Manage Groups</h3>
-            <p className="text-sm text-muted-foreground">
-              {currentUser.role === "class_representative"
-                ? "Set up new assignment groups or view existing ones."
-                : "Join assignment groups or view your current group memberships."}
-            </p>
-          </Link>
-          <Link href="/settings" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
-            <h3 className="font-semibold text-lg mb-1">Update Settings</h3>
-            <p className="text-sm text-muted-foreground">
-              Manage your profile information and application preferences.
-            </p>
+          <Link href="/rooms" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
+            <div className="flex items-center mb-1">
+              <LayoutGrid className="mr-2 h-5 w-5 text-primary" />
+              <h3 className="font-semibold text-lg text-primary">Explore Rooms</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Access documents and groups organized by semester and unit.</p>
           </Link>
         </CardContent>
       </Card>
